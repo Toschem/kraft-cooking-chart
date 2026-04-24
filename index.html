@@ -93,14 +93,14 @@ svg#lsvg{display:block;width:100%;overflow:visible}
   </div>
 </div>
 
-<svg id="lsvg" viewBox="0 0 660 480"></svg>
+<svg id="lsvg" viewBox="0 0 660 510"></svg>
 <div class="calc"><div class="calc-title">計算過程</div><div id="calc"></div></div>
 </div>
 
 <script>
 const isDark = matchMedia('(prefers-color-scheme:dark)').matches;
 const X0=88, W=552, BH=36;
-const RY=[18,104,208,302,396];
+const RY=[18,108,232,326,420];
 
 const TEAL_S=isDark?'#5DCAA5':'#0F6E56';
 const BLUE_S=isDark?'#378ADD':'#185FA5';
@@ -183,6 +183,31 @@ function build(aa,s,lr){
   o+=seg(X0+bw[1].n,RY[1],bw[1].h,BLUE_F,BLUE_S,[r.naoh_n.toFixed(2)+' g'],TB);
   const rx1=X0+bw[1].n+bw[1].h;
   o+=tx(rx1+5,RY[1]+BH/2,'計 '+(r.na2s_n+r.naoh_n).toFixed(2)+' g','start',10,'500',TL);
+  const pn=r.na2s_n+r.naoh_n>0?(r.na2s_n/(r.na2s_n+r.naoh_n)*100):0;
+  const pb=100-pn;
+  const yArrow=RY[1]+BH+11;
+  const yRatio=yArrow+16;
+  if(bw[1].n>4) o+=tx(X0+bw[1].n/2,yRatio,pn.toFixed(1)+'%','middle',10,'400',TS);
+  if(bw[1].h>4) o+=tx(X0+bw[1].n+bw[1].h/2,yRatio,pb.toFixed(1)+'%','middle',10,'400',TS);
+  // 両頭矢印
+  const arL=X0+2, arR=X0+bw[1].n-2;
+  const arL2=X0+bw[1].n+2, arR2=X0+bw[1].n+bw[1].h-2;
+  const ac=isDark?'rgba(93,202,165,0.7)':'rgba(15,110,86,0.55)';
+  const ac2=isDark?'rgba(55,138,221,0.7)':'rgba(24,95,165,0.5)';
+  if(arR-arL>6){
+    o+=`<defs>
+      <marker id="ah-l" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M6,0 L0,3 L6,6" fill="none" stroke="${ac}" stroke-width="1.2"/></marker>
+      <marker id="ah-r" markerWidth="6" markerHeight="6" refX="0" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="none" stroke="${ac}" stroke-width="1.2"/></marker>
+    </defs>
+    <line x1="${arL}" y1="${yArrow}" x2="${arR}" y2="${yArrow}" stroke="${ac}" stroke-width="1.2" marker-start="url(#ah-l)" marker-end="url(#ah-r)"/>`;
+  }
+  if(arR2-arL2>6){
+    o+=`<defs>
+      <marker id="ah-l2" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M6,0 L0,3 L6,6" fill="none" stroke="${ac2}" stroke-width="1.2"/></marker>
+      <marker id="ah-r2" markerWidth="6" markerHeight="6" refX="0" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="none" stroke="${ac2}" stroke-width="1.2"/></marker>
+    </defs>
+    <line x1="${arL2}" y1="${yArrow}" x2="${arR2}" y2="${yArrow}" stroke="${ac2}" stroke-width="1.2" marker-start="url(#ah-l2)" marker-end="url(#ah-r2)"/>`;
+  }
 
   // Row 2: 添加量
   o+=tx(X0-8,RY[2]+BH/2,'添加量','end',13,'700',TL);
