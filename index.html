@@ -93,14 +93,14 @@ svg#lsvg{display:block;width:100%;overflow:visible}
   </div>
 </div>
 
-<svg id="lsvg" viewBox="0 0 660 510"></svg>
+<svg id="lsvg" viewBox="0 0 660 524"></svg>
 <div class="calc"><div class="calc-title">計算過程</div><div id="calc"></div></div>
 </div>
 
 <script>
 const isDark = matchMedia('(prefers-color-scheme:dark)').matches;
 const X0=88, W=552, BH=36;
-const RY=[18,108,232,326,420];
+const RY=[18,122,246,340,434];
 
 const TEAL_S=isDark?'#5DCAA5':'#0F6E56';
 const BLUE_S=isDark?'#378ADD':'#185FA5';
@@ -175,6 +175,20 @@ function build(aa,s,lr){
   o+=tx(X0-8,RY[0]+BH/2,'木材チップ','end',13,'700',TL);
   o+=`<rect x="${X0}" y="${RY[0]}" width="${W}" height="${BH}" rx="2" fill="${CHIP_F}" stroke="${CHIP_S}" stroke-width="0.8"/>`;
   o+=tx(X0+W/2,RY[0]+BH/2,'100 g（絶乾重量）','middle',12,'500',CHIP_T);
+  // チップバー下：AA幅の両頭矢印 + AA%
+  const aaW=(r.na2s_n+r.naoh_n)*SCALE_G;
+  const yAA_arrow=RY[0]+BH+11;
+  const yAA_pct=yAA_arrow+16;
+  const aap=aa; // AA添加率%
+  const pc=isDark?'rgba(127,119,221,0.75)':'rgba(83,74,183,0.65)';
+  if(aaW>6){
+    o+=`<defs>
+      <marker id="ah-p1" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M6,0 L0,3 L6,6" fill="none" stroke="${pc}" stroke-width="1.2"/></marker>
+      <marker id="ah-p2" markerWidth="6" markerHeight="6" refX="0" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="none" stroke="${pc}" stroke-width="1.2"/></marker>
+    </defs>
+    <line x1="${(X0+2).toFixed(1)}" y1="${yAA_arrow}" x2="${(X0+aaW-2).toFixed(1)}" y2="${yAA_arrow}" stroke="${pc}" stroke-width="1.2" marker-start="url(#ah-p1)" marker-end="url(#ah-p2)"/>`;
+    o+=tx(X0+aaW/2,yAA_pct,aap.toFixed(1)+'%','middle',10,'400',isDark?'#AFA9EC':'#534AB7');
+  }
 
   // Row 1: AA as Na₂O
   o+=tx(X0-8,RY[1]+BH/2-7,'AA','end',13,'700',TL);
@@ -187,8 +201,8 @@ function build(aa,s,lr){
   const pb=100-pn;
   const yArrow=RY[1]+BH+11;
   const yRatio=yArrow+16;
-  if(bw[1].n>4) o+=tx(X0+bw[1].n/2,yRatio,pn.toFixed(1)+'%','middle',10,'400',TS);
-  if(bw[1].h>4) o+=tx(X0+bw[1].n+bw[1].h/2,yRatio,pb.toFixed(1)+'%','middle',10,'400',TS);
+  if(bw[1].n>4) o+=tx(X0+bw[1].n/2,yRatio,pn.toFixed(1)+'%','middle',10,'400',isDark?'#9FE1CB':'#065f46');
+  if(bw[1].h>4) o+=tx(X0+bw[1].n+bw[1].h/2,yRatio,pb.toFixed(1)+'%','middle',10,'400',isDark?'#85B7EB':'#1e40af');
   // 両頭矢印
   const arL=X0+2, arR=X0+bw[1].n-2;
   const arL2=X0+bw[1].n+2, arR2=X0+bw[1].n+bw[1].h-2;
