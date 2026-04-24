@@ -55,7 +55,7 @@ svg#lsvg{display:block;width:100%;overflow:visible}
 </head>
 <body>
 <div class="wrap">
-<h1>蒸解薬品量　対応関係チャート（絶乾木粉 100 g 基準）</h1>
+<h1>蒸解薬品量　対応関係チャート（絶乾木材チップ 100 g を基準とする）</h1>
 
 <div class="controls">
   <div class="ctrl">
@@ -172,9 +172,9 @@ function build(aa,s,lr){
   </defs>`;
 
   // Row 0: chip (static)
-  o+=tx(X0-8,RY[0]+BH/2,'チップ','end',13,'700',TL);
+  o+=tx(X0-8,RY[0]+BH/2,'木材チップ','end',13,'700',TL);
   o+=`<rect x="${X0}" y="${RY[0]}" width="${W}" height="${BH}" rx="2" fill="${CHIP_F}" stroke="${CHIP_S}" stroke-width="0.8"/>`;
-  o+=tx(X0+W/2,RY[0]+BH/2,'100 g（絶乾木粉）','middle',12,'500',CHIP_T);
+  o+=tx(X0+W/2,RY[0]+BH/2,'100 g（絶乾重量）','middle',12,'500',CHIP_T);
 
   // Row 1: AA as Na₂O
   o+=tx(X0-8,RY[1]+BH/2-7,'AA','end',13,'700',TL);
