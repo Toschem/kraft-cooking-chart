@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f8f7f4;color:#2c2c2a;padding:20px;min-height:100vh}
+.wrap{max-width:720px;margin:0 auto;background:#fff;border-radius:12px;padding:24px;border:0.5px solid #d3d1c7}
+h1{font-size:14px;font-weight:500;color:#5f5e5a;margin-bottom:16px;letter-spacing:0.02em}
+.controls{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.ctrl{display:flex;align-items:center;gap:8px}
+.ctrl label{font-size:12px;color:#73726c;min-width:72px}
+.ctrl input[type=range]{flex:1;height:4px;accent-color:#185FA5}
+.ctrl input[type=number]{width:62px;font-size:12px;font-weight:500;color:#2c2c2a;background:#f8f7f4;border:0.5px solid #d3d1c7;border-radius:6px;padding:3px 6px;text-align:right;-moz-appearance:textfield}
+.ctrl input[type=number]::-webkit-inner-spin-button{opacity:0.4}
+.ctrl input[type=number]:focus{outline:none;border-color:#185FA5;background:#fff}
+.ctrl .unit{font-size:12px;color:#888780;min-width:16px}
+.ctrl span{font-size:12px;font-weight:500;min-width:44px;text-align:right;color:#2c2c2a}
+.legend{display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#73726c}
+svg#lsvg{display:block;width:100%;overflow:visible}
+.calc{margin-top:24px;border-top:0.5px solid #d3d1c7;padding-top:20px}
+.calc-title{font-size:11px;font-weight:500;color:#888780;margin-bottom:14px;letter-spacing:0.06em;text-transform:uppercase}
+.step{display:flex;gap:12px;margin-bottom:16px;align-items:flex-start}
+.snum{flex-shrink:0;width:20px;height:20px;border-radius:50%;background:#f1efe8;border:0.5px solid #d3d1c7;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:#5f5e5a;margin-top:2px}
+.sbody{flex:1;min-width:0}
+.stitle{font-size:12px;font-weight:500;color:#3d3d3a;margin-bottom:6px}
+.fml{font-size:12px;font-family:ui-monospace,'Cascadia Code',monospace;line-height:1.9;color:#3d3d3a}
+.fr{display:block}
+.op{color:#b4b2a9}.eq{color:#888780}
+.vn{color:#065f46;font-weight:600}.vb{color:#1e40af;font-weight:600}
+.vp{color:#3C3489;font-weight:600}.va{color:#3d3d3a;font-weight:600}
+.dim{color:#888780;font-size:11px}
+.indent{padding-left:16px}
+@media(prefers-color-scheme:dark){
+  .calc{border-top-color:#444441}
+  .calc-title{color:#5f5e5a}
+  .snum{background:#2c2c2a;border-color:#444441;color:#888780}
+  .stitle{color:#c2c0b6}.fml{color:#c2c0b6}
+  .op,.eq,.dim{color:#5f5e5a}
+  .vn{color:#9FE1CB}.vb{color:#85B7EB}.vp{color:#AFA9EC}.va{color:#c2c0b6}
+}
+@media(prefers-color-scheme:dark){
+  body{background:#1a1a18;color:#c2c0b6}
+  .wrap{background:#232321;border-color:#444441}
+  h1{color:#888780}
+  .ctrl label{color:#888780}
+  .ctrl span{color:#c2c0b6}
+  .ctrl input[type=number]{background:#2c2c2a;border-color:#444441;color:#c2c0b6}
+  .ctrl input[type=number]:focus{background:#333331;border-color:#378ADD}
+  .leg-item{color:#888780}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>蒸解薬品量　対応関係チャート（絶乾木粉 100 g 基準）</h1>
+
+<div class="controls">
+  <div class="ctrl">
+    <label>活性アルカリ(AA)</label>
+    <input type="range" id="sl-aa" min="10" max="50" step="any" value="38.5">
+    <input type="number" id="ni-aa" min="10" max="50" step="0.1" value="38.5">
+    <span class="unit">%</span>
+  </div>
+  <div class="ctrl">
+    <label>硫化度</label>
+    <input type="range" id="sl-s" min="0" max="100" step="any" value="28">
+    <input type="number" id="ni-s" min="0" max="100" step="0.1" value="28">
+    <span class="unit">%</span>
+  </div>
+  <div class="ctrl">
+    <label>液比</label>
+    <input type="range" id="sl-lr" min="0.1" max="10" step="any" value="7">
+    <input type="number" id="ni-lr" min="0.1" max="10" step="0.1" value="7">
+    <span class="unit"></span>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="leg-item">
+    <svg width="20" height="12"><defs><pattern id="lh" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="#0F6E56" stroke-width="1.5"/></pattern></defs><rect width="20" height="12" fill="url(#lh)" rx="2" stroke="#0F6E56" stroke-width="0.5"/></svg>
+    Na₂S由来
+  </div>
+  <div class="leg-item">
+    <svg width="20" height="12"><rect width="20" height="12" fill="#dbeafe" rx="2" stroke="#185FA5" stroke-width="0.5"/></svg>
+    NaOH由来
+  </div>
+  <div class="leg-item">
+    <svg width="20" height="8"><line x1="0" y1="4" x2="20" y2="4" stroke="#888" stroke-width="1" stroke-dasharray="3,2"/></svg>
+    変換対応
+  </div>
+</div>
+
+<svg id="lsvg" viewBox="0 0 660 480"></svg>
+<div class="calc"><div class="calc-title">計算過程</div><div id="calc"></div></div>
+</div>
+
+<script>
+const isDark = matchMedia('(prefers-color-scheme:dark)').matches;
+const X0=88, W=552, BH=36;
+const RY=[18,104,208,302,396];
+
+const TEAL_S=isDark?'#5DCAA5':'#0F6E56';
+const BLUE_S=isDark?'#378ADD':'#185FA5';
+const CHIP_S=isDark?'#7F77DD':'#534AB7';
+const CHIP_F=isDark?'rgba(38,33,92,0.6)':'#ede9fe';
+const CHIP_T=isDark?'#AFA9EC':'#3C3489';
+const TEAL_F=isDark?'rgba(8,80,65,0.45)':'#d1fae5';
+const BLUE_F=isDark?'rgba(4,44,83,0.45)':'#dbeafe';
+const TT=isDark?'#9FE1CB':'#065f46';
+const TB=isDark?'#85B7EB':'#1e40af';
+const TL=isDark?'#c2c0b6':'#2c2c2a';
+const TS=isDark?'#888780':'#5f5e5a';
+const CT=isDark?'rgba(93,202,165,0.65)':'rgba(15,110,86,0.4)';
+const CB=isDark?'rgba(55,138,221,0.65)':'rgba(24,95,165,0.35)';
+const HC=isDark?'#5DCAA5':'#0F6E56';
+
+const SCALE_G=W/100;
+const SCALE_ML=W/560;
+const SCALE_ION=W/1.5;
+
+function calc(aa,s,lr){
+  const na2s_n=aa*s/100, naoh_n=aa*(1-s/100);
+  const naoh_g=naoh_n*80/62, naoh_m=naoh_g/40;
+  const na2s_g=na2s_n*78/62, na2s_m=na2s_g/78;
+  const naoh_v=naoh_m/4*1000, na2s_v=na2s_m*1000;
+  const vol_L=lr*0.1;
+  const hs_mol=na2s_m;
+  const oh_mol=naoh_m+na2s_m;
+  const hs_conc=hs_mol/vol_L;
+  const oh_conc=oh_mol/vol_L;
+  return{na2s_n,naoh_n,naoh_g,naoh_m,na2s_g,na2s_m,naoh_v,na2s_v,
+         hs_mol,oh_mol,hs_conc,oh_conc,vol_L};
+}
+
+function tx(x,y,s,a,sz,fw,c){
+  return`<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${a||'middle'}" dominant-baseline="central" style="font-size:${sz||10}px;font-weight:${fw||'400'};fill:${c||TL}">${s}</text>`;
+}
+
+function seg(x,y,w,fill,stroke,lines,tc){
+  if(w<0.5) return '';
+  let o=`<rect x="${x.toFixed(1)}" y="${y}" width="${w.toFixed(1)}" height="${BH}" rx="2" fill="${fill}" stroke="${stroke}" stroke-width="0.7"/>`;
+  if(w>44 && lines && lines.length){
+    const cx=x+w/2;
+    lines.forEach((ln,li)=>{
+      o+=tx(cx,y+BH/2+(lines.length>1?(li-0.5)*12:0),ln,'middle',10,'500',tc);
+    });
+  }
+  return o;
+}
+
+function build(aa,s,lr){
+  const r=calc(aa,s,lr);
+  const bw=[
+    {n:0,h:W},
+    {n:r.na2s_n*SCALE_G, h:r.naoh_n*SCALE_G},
+    {n:r.na2s_g*SCALE_G, h:r.naoh_g*SCALE_G},
+    {n:r.na2s_v*SCALE_ML,h:r.naoh_v*SCALE_ML},
+  ];
+  const ion_scale = bw[2].n / r.hs_mol;
+  bw.push({n: bw[2].n, h: bw[2].n + bw[2].h});
+
+  let o=`<defs>
+  <pattern id="h" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(45)">
+    <line x1="0" y1="0" x2="0" y2="7" stroke="${HC}" stroke-width="1.8" opacity="0.7"/>
+  </pattern>
+  <pattern id="hl" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(45)">
+    <line x1="0" y1="0" x2="0" y2="7" stroke="${HC}" stroke-width="1" opacity="0.35"/>
+  </pattern>
+  </defs>`;
+
+  // Row 0: chip (static)
+  o+=tx(X0-8,RY[0]+BH/2,'チップ','end',13,'700',TL);
+  o+=`<rect x="${X0}" y="${RY[0]}" width="${W}" height="${BH}" rx="2" fill="${CHIP_F}" stroke="${CHIP_S}" stroke-width="0.8"/>`;
+  o+=tx(X0+W/2,RY[0]+BH/2,'100 g（絶乾木粉）','middle',12,'500',CHIP_T);
+
+  // Row 1: AA as Na₂O
+  o+=tx(X0-8,RY[1]+BH/2-7,'AA','end',13,'700',TL);
+  o+=tx(X0-8,RY[1]+BH/2+7,'as Na₂O','end',10,'400',TS);
+  o+=seg(X0,RY[1],bw[1].n,'url(#h)',TEAL_S,[r.na2s_n.toFixed(2)+' g'],TT);
+  o+=seg(X0+bw[1].n,RY[1],bw[1].h,BLUE_F,BLUE_S,[r.naoh_n.toFixed(2)+' g'],TB);
+  const rx1=X0+bw[1].n+bw[1].h;
+  o+=tx(rx1+5,RY[1]+BH/2,'計 '+(r.na2s_n+r.naoh_n).toFixed(2)+' g','start',10,'500',TL);
+
+  // Row 2: 添加量
+  o+=tx(X0-8,RY[2]+BH/2,'添加量','end',13,'700',TL);
+  if(bw[2].n>4) o+=tx(X0+bw[2].n/2,RY[2]-9,'Na₂S','middle',11,'700',TL);
+  if(bw[2].h>4) o+=tx(X0+bw[2].n+bw[2].h/2,RY[2]-9,'NaOH','middle',11,'700',TL);
+  o+=seg(X0,RY[2],bw[2].n,'url(#h)',TEAL_S,[r.na2s_g.toFixed(2)+' g','('+r.na2s_m.toFixed(3)+' mol)'],TT);
+  o+=seg(X0+bw[2].n,RY[2],bw[2].h,BLUE_F,BLUE_S,[r.naoh_g.toFixed(2)+' g','('+r.naoh_m.toFixed(3)+' mol)'],TB);
+
+  // Row 3: 溶液量
+  o+=tx(X0-8,RY[3]+BH/2,'溶液量','end',13,'700',TL);
+  if(bw[3].n>4) o+=tx(X0+bw[3].n/2,RY[3]-9,'1 mol/L Na₂S aq.','middle',11,'700',TL);
+  if(bw[3].h>4) o+=tx(X0+bw[3].n+bw[3].h/2,RY[3]-9,'4 mol/L NaOH aq.','middle',11,'700',TL);
+  o+=seg(X0,RY[3],bw[3].n,'url(#h)',TEAL_S,[r.na2s_v.toFixed(1)+' mL'],TT);
+  o+=seg(X0+bw[3].n,RY[3],bw[3].h,BLUE_F,BLUE_S,[r.naoh_v.toFixed(1)+' mL'],TB);
+
+  // Total label row 3
+  const tot3=r.na2s_v+r.naoh_v;
+  const rx3=X0+bw[3].n+bw[3].h;
+  if(rx3<X0+W-4) o+=tx(rx3+5,RY[3]+BH/2,tot3.toFixed(1)+' mL','start',10,'400',TS);
+
+  // Row 4: 実量（陰イオン）
+  o+=tx(X0-8,RY[4]+BH/2-7,'アニオン','end',11,'500',TL);
+  o+=tx(X0-8,RY[4]+BH/2+7,'実量','end',11,'500',TL);
+  if(bw[4].n>4) o+=tx(X0+bw[4].n/2,RY[4]-9,'HS⁻','middle',11,'700',TL);
+  if(bw[4].h>4) o+=tx(X0+bw[4].n+bw[4].h/2,RY[4]-9,'HO⁻','middle',11,'700',TL);
+  o+=seg(X0,RY[4],bw[4].n,'url(#hl)',isDark?'rgba(93,202,165,0.35)':'#9FE1CB',
+    [r.hs_mol.toFixed(3)+' mol'],isDark?'#5DCAA5':'#0F6E56');
+  o+=seg(X0+bw[4].n,RY[4],bw[4].h,isDark?'rgba(4,44,83,0.2)':'#EBF5FF',isDark?'rgba(55,138,221,0.45)':'#B5D4F4',
+    [r.oh_mol.toFixed(3)+' mol'],isDark?'#85B7EB':'#185FA5');
+  const yBelow1=RY[4]+BH+11, yBelow2=RY[4]+BH+23;
+  if(bw[4].n>4){
+    o+=tx(X0+bw[4].n/2,yBelow1,'液比'+f(lr,1)+'のとき','middle',10,'400',TS);
+    o+=tx(X0+bw[4].n/2,yBelow2,f(r.hs_conc,3)+' mol/L','middle',10,'700',TS);
+  }
+  if(bw[4].h>4){
+    o+=tx(X0+bw[4].n+bw[4].h/2,yBelow1,'液比'+f(lr,1)+'のとき','middle',10,'400',TS);
+    o+=tx(X0+bw[4].n+bw[4].h/2,yBelow2,f(r.oh_conc,3)+' mol/L','middle',10,'700',TS);
+  }
+
+  // Connecting lines
+  function cln(x1,y1,x2,y2,col){
+    return`<line x1="${x1.toFixed(1)}" y1="${y1}" x2="${x2.toFixed(1)}" y2="${y2}" stroke="${col}" stroke-width="1" stroke-dasharray="4,3"/>`;
+  }
+
+  // 0→1
+  const na1=X0+bw[1].n, to1=X0+bw[1].n+bw[1].h;
+  o+=cln(na1,RY[0]+BH,na1,RY[1],CT);
+  o+=cln(to1,RY[0]+BH,to1,RY[1],CB);
+  // 1→2
+  o+=cln(X0+bw[1].n,RY[1]+BH,X0+bw[2].n,RY[2],CT);
+  o+=cln(X0+bw[1].n+bw[1].h,RY[1]+BH,X0+bw[2].n+bw[2].h,RY[2],CB);
+  // 2→3
+  o+=cln(X0+bw[2].n,RY[2]+BH,X0+bw[3].n,RY[3],CT);
+  o+=cln(X0+bw[2].n+bw[2].h,RY[2]+BH,X0+bw[3].n+bw[3].h,RY[3],CB);
+  // 3→4
+  o+=cln(X0+bw[3].n,RY[3]+BH,X0+bw[4].n,RY[4],CT);
+  o+=cln(X0+bw[3].n+bw[3].h,RY[3]+BH,X0+bw[4].n+bw[4].h,RY[4],CB);
+
+  return o;
+}
+
+function f(v,d){return parseFloat(v.toFixed(d)).toString();}
+
+function renderCalc(aa,s,lr){
+  const r=calc(aa,s,lr);
+  const conv_naoh=(80/62), conv_na2s=(78/62);
+
+  function step(n,title,lines){
+    return`<div class="step"><div class="snum">${n}</div><div class="sbody"><div class="stitle">${title}</div><div class="fml">${lines}</div></div></div>`;
+  }
+
+  const s1=step(1,'AA量（Na₂O換算）',`
+<span class="fr">絶乾チップ <span class="vp">${f(100,0)} g</span> <span class="op">×</span> AA添加率 <span class="vp">${f(aa,1)}%</span> <span class="eq">=</span> <span class="vp">${f(r.na2s_n+r.naoh_n,2)} g</span> <span class="dim">（as Na₂O）</span></span>`);
+
+  const s2=step(2,'硫化度による按分',`
+<span class="fr">Na₂S由来 <span class="op">:</span> <span class="vp">${f(r.na2s_n+r.naoh_n,2)}</span> <span class="op">×</span> <span class="vn">${f(s*1,0)}%</span> <span class="eq">=</span> <span class="vn">${f(r.na2s_n,2)} g</span> <span class="dim">（as Na₂O）</span></span>
+<span class="fr">NaOH由来 <span class="op">:</span> <span class="vp">${f(r.na2s_n+r.naoh_n,2)}</span> <span class="op">×</span> <span class="vb">${f((1-s/100)*100,0)}%</span> <span class="eq">=</span> <span class="vb">${f(r.naoh_n,2)} g</span> <span class="dim">（as Na₂O）</span></span>`);
+
+  const s3=step(3,'NaOH 添加量',`
+<span class="fr"><span class="dim">変換係数（Na₂O→NaOH）：MW(NaOH)/MW(Na₂O) = 80/62 = ${f(conv_naoh,4)}</span></span>
+<span class="fr"><span class="vb">${f(r.naoh_n,2)} g</span> <span class="op">×</span> (80/62) <span class="eq">=</span> <span class="vb">${f(r.naoh_g,4)} g</span> <span class="op">≈</span> <span class="vb">${f(r.naoh_g,2)} g</span></span>
+<span class="fr"><span class="vb">${f(r.naoh_g,2)} g</span> <span class="op">÷</span> MW(NaOH) 40 <span class="eq">=</span> <span class="vb">${f(r.naoh_m,4)} mol</span> <span class="op">≈</span> <span class="vb">${f(r.naoh_m,3)} mol</span></span>`);
+
+  const s4=step(4,'Na₂S 添加量',`
+<span class="fr"><span class="dim">変換係数（Na₂O→Na₂S）：MW(Na₂S)/MW(Na₂O) = 78/62 = ${f(conv_na2s,4)}</span></span>
+<span class="fr"><span class="vn">${f(r.na2s_n,2)} g</span> <span class="op">×</span> (78/62) <span class="eq">=</span> <span class="vn">${f(r.na2s_g,4)} g</span> <span class="op">≈</span> <span class="vn">${f(r.na2s_g,2)} g</span></span>
+<span class="fr"><span class="vn">${f(r.na2s_g,2)} g</span> <span class="op">÷</span> MW(Na₂S) 78 <span class="eq">=</span> <span class="vn">${f(r.na2s_m,4)} mol</span> <span class="op">≈</span> <span class="vn">${f(r.na2s_m,3)} mol</span></span>`);
+
+  const s5=step(5,'溶液量',`
+<span class="fr">NaOH <span class="dim">（4 mol/L 水溶液）:</span>　<span class="vb">${f(r.naoh_m,3)} mol</span> <span class="op">÷</span> 4 mol/L <span class="eq">=</span> <span class="vb">${f(r.naoh_m/4,4)} L</span> <span class="eq">=</span> <span class="vb">${f(r.naoh_v,1)} mL</span></span>
+<span class="fr">Na₂S <span class="dim">（1 mol/L 水溶液）:</span>　<span class="vn">${f(r.na2s_m,3)} mol</span> <span class="op">÷</span> 1 mol/L <span class="eq">=</span> <span class="vn">${f(r.na2s_m,4)} L</span> <span class="eq">=</span> <span class="vn">${f(r.na2s_v,1)} mL</span></span>`);
+
+  const s6=step(6,'蒸解液中の陰イオン実量',`
+<span class="fr"><span class="dim">蒸解液総量：液比 ${f(lr,1)} × 絶乾チップ 0.1 kg = ${f(r.vol_L,3)} L = ${f(r.vol_L*1000,0)} mL</span></span>
+<span class="fr" style="margin-top:4px">HS⁻ <span class="dim">（Na₂S の加水分解：Na₂S + H₂O → NaSH + NaOH）</span></span>
+<span class="fr indent"><span class="vn">${f(r.na2s_m,3)} mol</span> Na₂S <span class="op">→</span> <span class="vn">${f(r.hs_mol,3)} mol</span> HS⁻　<span class="op">/</span>　[HS⁻] <span class="eq">=</span> <span class="vn">${f(r.hs_mol,3)}</span> <span class="op">÷</span> ${f(r.vol_L,3)} L <span class="eq">=</span> <span class="vn">${f(r.hs_conc,4)} mol/L</span></span>
+<span class="fr" style="margin-top:4px">HO⁻ <span class="dim">（NaOH直接 + Na₂S加水分解由来）</span></span>
+<span class="fr indent">NaOH直接：<span class="vb">${f(r.naoh_m,3)} mol</span>　<span class="op">+</span>　Na₂S由来：<span class="vn">${f(r.na2s_m,3)} mol</span>　<span class="eq">=</span>　<span class="va">${f(r.oh_mol,3)} mol</span></span>
+<span class="fr indent">[HO⁻] <span class="eq">=</span> <span class="va">${f(r.oh_mol,3)}</span> <span class="op">÷</span> ${f(r.vol_L,3)} L <span class="eq">=</span> <span class="va">${f(r.oh_conc,4)} mol/L</span></span>`);
+
+  document.getElementById('calc').innerHTML=s1+s2+s3+s4+s5+s6;
+}
+
+function clamp(v,mn,mx){return Math.min(mx,Math.max(mn,v));}
+
+function update(src){
+  let aa,s,lr;
+  if(src==='ni'){
+    aa=clamp(parseFloat(document.getElementById('ni-aa').value)||38.5,10,50);
+    s =clamp(parseFloat(document.getElementById('ni-s').value)||28,0,100);
+    lr=clamp(parseFloat(document.getElementById('ni-lr').value)||7,0.1,10);
+    document.getElementById('sl-aa').value=aa;
+    document.getElementById('sl-s').value=s;
+    document.getElementById('sl-lr').value=lr;
+  } else {
+    aa=parseFloat(document.getElementById('sl-aa').value);
+    s =parseFloat(document.getElementById('sl-s').value);
+    lr=parseFloat(document.getElementById('sl-lr').value);
+    document.getElementById('ni-aa').value=aa.toFixed(2);
+    document.getElementById('ni-s').value=s.toFixed(2);
+    document.getElementById('ni-lr').value=lr.toFixed(2);
+  }
+  document.getElementById('lsvg').innerHTML=build(aa,s,lr);
+  renderCalc(aa,s,lr);
+}
+
+['sl-aa','sl-s','sl-lr'].forEach(id=>document.getElementById(id).addEventListener('input',()=>update('sl')));
+['ni-aa','ni-s','ni-lr'].forEach(id=>document.getElementById(id).addEventListener('change',()=>update('ni')));
+update('sl');
+</script>
+</body>
+</html>
